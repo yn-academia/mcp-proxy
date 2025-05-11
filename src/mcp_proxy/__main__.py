@@ -78,6 +78,11 @@ def main() -> None:
         default=[],
     )
     stdio_client_options.add_argument(
+        "--cwd",
+        default=None,
+        help="The working directory to use when spawning the process.",
+    )
+    stdio_client_options.add_argument(
         "--pass-environment",
         action=argparse.BooleanOptionalAction,
         help="Pass through all environment variables when spawning the server.",
@@ -90,30 +95,36 @@ def main() -> None:
         default=False,
     )
 
-    sse_server_group = parser.add_argument_group("SSE server options")
-    sse_server_group.add_argument(
+    mcp_server_group = parser.add_argument_group("SSE server options")
+    mcp_server_group.add_argument(
         "--port",
         type=int,
         default=None,
         help="Port to expose an SSE server on. Default is a random port",
     )
-    sse_server_group.add_argument(
+    mcp_server_group.add_argument(
         "--host",
         default=None,
         help="Host to expose an SSE server on. Default is 127.0.0.1",
     )
-    sse_server_group.add_argument(
+    mcp_server_group.add_argument(
+        "--stateless",
+        action=argparse.BooleanOptionalAction,
+        help="Enable stateless mode for streamable http transports. Default is False",
+        default=False,
+    )
+    mcp_server_group.add_argument(
         "--sse-port",
         type=int,
         default=0,
         help="Port to expose an SSE server on. Default is a random port",
     )
-    sse_server_group.add_argument(
+    mcp_server_group.add_argument(
         "--sse-host",
         default="127.0.0.1",
         help="Host to expose an SSE server on. Default is 127.0.0.1",
     )
-    sse_server_group.add_argument(
+    mcp_server_group.add_argument(
         "--allow-origin",
         nargs="+",
         default=[],
@@ -161,11 +172,13 @@ def main() -> None:
         command=args.command_or_url,
         args=args.args,
         env=env,
+        cwd=args.cwd if args.cwd else None,
     )
 
     mcp_settings = MCPServerSettings(
         bind_host=args.host if args.host is not None else args.sse_host,
         port=args.port if args.port is not None else args.sse_port,
+        stateless=args.stateless,
         allow_origins=args.allow_origin if len(args.allow_origin) > 0 else None,
         log_level="DEBUG" if args.debug else "INFO",
     )
