@@ -26,6 +26,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 FROM python:3.12-alpine
 
 COPY --from=uv --chown=app:app /app/.venv /app/.venv
+COPY --from=uv --chown=app:app /app/github-mcp-server-linux-arm64 /app/github-mcp-server-linux-arm64
 
 # Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH"
